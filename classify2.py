@@ -177,9 +177,11 @@ def run_inference_on_image(image):
     node_lookup = NodeLookup()
 
     top_k = predictions.argsort()[-FLAGS.num_top_predictions:][::-1]
+    l = []
     for node_id in top_k:
       human_string = node_lookup.id_to_string(node_id)
-      return human_string
+      l.append(human_string)
+    return l
       # score = predictions[node_id]
       # print('%s (score = %.5f)' % (human_string, score))
 
@@ -227,15 +229,28 @@ def main(_):
         sys.exit(0)
       call(["imagesnap", "images/pic.jpg"])
       image = os.path.join('images', "pic.jpg")
-      obj = run_inference_on_image(image)
-      if obj not in classes:
-        print("This is a {}".format(obj))
-        is_recyclable = raw_input("Is this item recyclable y/n? ")
-        classes[obj] = "recycle" if is_recyclable == "y" else "trash"
-        fp.write("{}:{}\n".format(obj, classes[obj]))
-      print(obj, classes[obj])
+      l = run_inference_on_image(image)
+      found = False
+      for obj in l:
+        if obj in classes:
+          print(obj, classes[obj])
+          found = True
+          break
+      if found:
+          continue
 
+      #else
 
+      i = 0
+      for obj in l:
+        print(i + "  " + "This is a {}".format(obj))
+        i += 1
+      objIndex = int(raw_input("What item is this?  Enter a number"))
+      item = l[objIndex]
+      s_recyclable = raw_input("Is this item recyclable y/n? ")
+      classes[obj] = "recycle" if is_recyclable == "y" else "trash"
+      fp.write("{}:{}\n".format(item, classes[item]))
+      print(item, classes[item])
 
 if __name__ == '__main__':
   tf.app.run()
