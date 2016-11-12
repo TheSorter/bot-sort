@@ -1,0 +1,6 @@
+punching bag, punch bag, punching ball, punchball:trash
+coffee mug:trash
+lemon:trash
+water bottle:recycle
+vending machine:trash
+lab coat, laboratory coat:trash
