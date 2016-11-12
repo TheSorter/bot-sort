@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
-import serial
+import serial # pip3 install pyserial
 import time
 import sys
 
