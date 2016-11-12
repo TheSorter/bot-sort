@@ -46,6 +46,9 @@ import tensorflow as tf
 
 import os
 from subprocess import call
+from robotArm import RobotArm
+from collections import defaultdict
+import requests
 
 FLAGS = tf.app.flags.FLAGS
 
@@ -221,6 +224,10 @@ def main(_):
   # Creates graph from saved GraphDef.
   create_graph()
   classes = gen_dict()
+  arm = RobotArm("/dev/cu.usbmodem641")
+  push_url = "https://api.powerbi.com/beta/44467e6f-462c-4ea2-823f-7800de5434e3/datasets/0a14c51d-e7ca-447d-b171-fbee02cfd053/rows?key=udPVl%2BCy3ycNEOSXgolBL%2B3D9aK5P9sIAkbN%2BVebh8tGMoqpWVJTffvYWGfjw6Ww3%2F8UBjghOw2zgmfZn5yeKw%3D%3D"
+  object_counts = defaultdict(int)
+  category_counts = [0, 0, 0]
 
   img_count = 0
   with open("classes.txt", "a") as fp:
@@ -236,23 +243,44 @@ def main(_):
       for obj in l:
         if obj in classes:
           print(obj, classes[obj])
+          item = obj
           found = True
           break
-      if found:
-          continue
-
-      #else
-
-      i = 0
-      for obj in l:
-        print(str(i) + "  " + obj)
-        i += 1
-      objIndex = int(raw_input("What item is this?  Enter a number"))
-      item = l[objIndex]
-      is_recyclable = raw_input("Is this item recyclable y/n? ")
-      classes[item] = "recycle" if is_recyclable == "y" else "trash"
-      fp.write("{}:{}\n".format(item, classes[item]))
+      if not found:
+        for i, obj in enumerate(l):
+          print(str(i) + "  " + obj)
+        objIndex = int(raw_input("What item is this?  Enter a number "))
+        item = l[objIndex]
+        is_recyclable = raw_input("Is this item recyclable y/n? ")
+        if is_recyclable:
+          classes[item] = "recycle"
+        else:
+          is_trash = raw_input("Is this item trash y/n? ")
+          if is_trash:
+            classes[item] = "trash"
+          else:
+            classes[item] = "other"
+        fp.write("{}:{}\n".format(item, classes[item]))
       print(item, classes[item])
+      if (classes[item] == "recycle"):
+        category_counts[0] + 1
+        arm.hit_left()
+      elif (classes[item] == "trash"):
+        category_counts[1] + 1
+        arm.hit_right()
+      else:
+        arm.hit_forward()
+        category_counts[2] + 1
+      name = item.split(",")[0].strip()
+      object_counts[name] += 1
+
+      curlies = ["{\"name\" :\"%s\",\n\"count\" :%d\n}" % (n1, count)
+                 for n1, count in object_counts.items()]
+      post_str = "[" + ",\n".join(curlies) + "\n]"
+      r = requests.post(push_url, data=post_str,
+                        headers={'Content-Type': 'application/octet-stream'})
+      print(r.status_code, r.reason)
+
 
 if __name__ == '__main__':
   tf.app.run()
