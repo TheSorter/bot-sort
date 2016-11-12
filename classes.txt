@@ -1,2 +1,5 @@
 
 pop bottle, soda bottle:recycle
+water bottle:recycle
+bakery, bakeshop, bakehouse:trash
+orange:trash
