@@ -1,4 +1,9 @@
 #include <Servo.h>
+#include <ros.h>
+#include <std_msgs/Int16.h>
+#include <std_msgs/String.h>
+#include <Arduino.h>
+
 
 Servo twist, claw, height, extend;
 const int twist_max = 180;
@@ -38,7 +43,7 @@ void hit_bottle_right(){
   delay(200);
   twist.write(90); //move arm back to center
   delay(500);
-  extend.write(90); //move arm back in 
+  extend.write(90); //move arm back in
   delay(500);
   digitalWrite(8, LOW);
 }
@@ -55,8 +60,12 @@ void hit_bottle_forward(){
   digitalWrite(8, LOW);
 }
 
+ros::NodeHandle nh;
+std_msgs::Int16 command;
+void armCallback(const std_msgs::Int16& command);
+ros::Subscriber<std_msgs::Int16> arm_sub_("arduino_commands", armCallback);
+
 void setup() {
-  Serial.begin(9600);
   twist.attach(3);
   claw.attach(9);
   height.attach(5);
@@ -69,21 +78,18 @@ void setup() {
   delay(100);
   extend.write(extend_default);
   delay(100);
+  nh.initNode();
+  nh.subscribe(arm_sub_);
 
 }
 
-void loop() {
-  int result = -1;
-  while(Serial.available()){
-    result = Serial.read();
-    result -= 48;
-    if(result == 10){
-      result = -1;
-      continue;
-    }
-  }
+
+
+
+void armCallback(const std_msgs::Int16& command)
+{
+  int result = command.data;
   if(result > 0){
-    Serial.println(result);
     switch(result){
       case 1:
         hit_bottle_left();
@@ -96,5 +102,9 @@ void loop() {
         break;
     }
   }
+}
 
+
+void loop() {
+  nh.spinOnce();
 }
