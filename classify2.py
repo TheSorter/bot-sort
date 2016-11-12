@@ -208,8 +208,10 @@ def gen_dict():
   result = {}
   with open("classes.txt") as fp:
     for line in fp:
-      [key, value] = line.split(":")
-      result[key] = value
+      line = line.strip()
+      if line:
+        [key, value] = line.split(":")
+        result[key] = value
   return result
 
 
@@ -243,12 +245,12 @@ def main(_):
 
       i = 0
       for obj in l:
-        print(i + "  " + "This is a {}".format(obj))
+        print(str(i) + "  " + obj)
         i += 1
       objIndex = int(raw_input("What item is this?  Enter a number"))
       item = l[objIndex]
-      s_recyclable = raw_input("Is this item recyclable y/n? ")
-      classes[obj] = "recycle" if is_recyclable == "y" else "trash"
+      is_recyclable = raw_input("Is this item recyclable y/n? ")
+      classes[item] = "recycle" if is_recyclable == "y" else "trash"
       fp.write("{}:{}\n".format(item, classes[item]))
       print(item, classes[item])
 
