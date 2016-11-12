@@ -9,8 +9,18 @@ import sys
 def get_input_and_act():
     for line in sys.stdin:
         line = line[:len(line)-1]
-        do_the_thing(line)
+        if line == 'recycle':
+            do_the_thing(1)
+        elif line == 'trash':
+            do_the_thing(2)
         time.sleep(2)
+
+
+def read_file_and_act():
+    with open('test.txt') as f:
+        for line in f.readlines():
+            line = line[:len(line) - 1]
+            print(line)
 
 
 def do_the_thing(motion):
@@ -55,7 +65,8 @@ print(baud_string, end="\n\n")
 ser = serial.Serial(port, baud)
 time.sleep(2)  # wait for serial on the arduino to initialize
 if action == '0':
-    get_input_and_act()
+    # get_input_and_act()
+    read_file_and_act()
 else:
     do_the_thing(action)
 time.sleep(2)
