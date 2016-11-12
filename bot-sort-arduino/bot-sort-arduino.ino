@@ -19,26 +19,26 @@ const int extend_default = 100;
 
 void hit_bottle_left(){
   digitalWrite(8, HIGH);
-  twist.write(45);
+  twist.write(45); //move arm right
+  delay(50);
+  extend.write(140); // move arm out
+  delay(200);
+  twist.write(90); // move arm back to center
   delay(500);
-  extend.write(140);
-  delay(500);
-  twist.write(90);
-  delay(500);
-  extend.write(90);
+  extend.write(90); // move arm back
   delay(500);
   digitalWrite(8, LOW);
 }
 
 void hit_bottle_right(){
   digitalWrite(8, HIGH);
-  twist.write(135);
+  twist.write(135); // move arm left
+  delay(50);
+  extend.write(130); // move arm out
+  delay(200);
+  twist.write(90); //move arm back to center
   delay(500);
-  extend.write(130);
-  delay(500);
-  twist.write(90);
-  delay(500);
-  extend.write(90);
+  extend.write(90); //move arm back in 
   delay(500);
   digitalWrite(8, LOW);
 }
@@ -46,16 +46,17 @@ void hit_bottle_right(){
 void hit_bottle_forward(){
   digitalWrite(8, HIGH);
   height.write(80);
-  delay(500);
+  delay(100);
   extend.write(130);
   delay(500);
   extend.write(90);
-  delay(500);
+  delay(50);
   height.write(height_default);
   digitalWrite(8, LOW);
 }
 
 void setup() {
+  Serial.begin(9600);
   twist.attach(3);
   claw.attach(9);
   height.attach(5);
@@ -68,8 +69,7 @@ void setup() {
   delay(100);
   extend.write(extend_default);
   delay(100);
-  Serial.begin(9600);
-  Serial.println("serial started");
+
 }
 
 void loop() {
@@ -83,7 +83,6 @@ void loop() {
     }
   }
   if(result > 0){
-    Serial.println("got number, it was: ");
     Serial.println(result);
     switch(result){
       case 1:
