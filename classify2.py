@@ -249,14 +249,17 @@ def main(_):
       if not found:
         for i, obj in enumerate(l):
           print(str(i) + "  " + obj)
-        objIndex = int(raw_input("What item is this?  Enter a number "))
-        item = l[objIndex]
+        try:
+          objIndex = int(raw_input("What item is this?  Enter a number "))
+          item = l[objIndex]
+        except:
+          continue
         is_recyclable = raw_input("Is this item recyclable y/n? ")
-        if is_recyclable:
+        if is_recyclable == "y":
           classes[item] = "recycle"
         else:
           is_trash = raw_input("Is this item trash y/n? ")
-          if is_trash:
+          if is_trash == "y":
             classes[item] = "trash"
           else:
             classes[item] = "other"
